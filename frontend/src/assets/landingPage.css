@@ -1,0 +1,72 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&family=Ubuntu:ital,wght@0,300;0,400;0,500;0,700;1,300;1,400;1,500;1,700&display=swap');
+
+* {
+    font-family: "Poppins";
+}
+
+.landing-page {
+    padding: 2rem;
+    text-align: center;
+}
+
+.title {
+    font-size: 2.5rem;
+    font-weight: bold;
+    margin-bottom: 1rem;
+}
+
+.subtitle {
+    font-size: 1.2rem;
+    color: #666;
+    margin-bottom: 2rem;
+}
+
+.levels-container {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    align-items: center;
+}
+
+.level-card {
+    width: 80%;
+    max-width: 500px;
+    padding: 1.5rem;
+    border: 2px solid #b29dd9;
+    border-radius: 10px;
+    background-color: #f9f9f9;
+    position: relative;
+    text-align: left;
+}
+
+.level-card.locked {
+    background-color: #f0f0f0;
+    opacity: 0.6;
+    pointer-events: none;
+}
+
+.level-title {
+    font-size: 1.5rem;
+    color: #5a4abf;
+    margin-bottom: 0.5rem;
+}
+
+.level-description {
+    color: #555;
+    font-size: 1rem;
+    margin-bottom: 1rem;
+}
+
+.level-items {
+    list-style-type: disc;
+    padding-left: 1.2rem;
+    color: #333;
+}
+
+.lock-icon {
+    font-size: 1.5rem;
+    color: #777;
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+}

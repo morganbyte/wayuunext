@@ -1,0 +1,14 @@
+.hero {
+    background-color: #f8f9fa !important;
+    padding: 4rem 0 !important;
+}
+.features {
+    padding: 2rem 0 !important;
+}
+.about {
+    text-align: center !important;
+}
+footer {
+    background-color: #343a40 !important;
+    color: #fff !important;
+}
