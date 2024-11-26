@@ -34,8 +34,7 @@ const Header = () => {
                         </>
                     ) : (
                         <>
-                            <a href='#about'>Sobre nosotros</a>
-                            <a href='#idea'>Nuestra idea</a>
+                            
                         </>
                     )}
                 </nav>
