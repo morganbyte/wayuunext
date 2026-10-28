@@ -9,6 +9,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 public class Usuario {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     private Long id;
 
     @Column(unique = true, nullable = false)
@@ -19,8 +20,14 @@ public class Usuario {
 
     private String email;
 
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     @Column(nullable = false, columnDefinition = "INTEGER DEFAULT 0")
     private Integer progress = 0;
+
+    // USER o ADMIN; solo se cambia desde la base de datos
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
+    @Column(nullable = false, columnDefinition = "VARCHAR(20) DEFAULT 'USER'")
+    private String role = "USER";
 
     public Usuario() {}
 
@@ -48,4 +55,7 @@ public class Usuario {
 
     public Integer getProgress() { return progress; }
     public void setProgress(Integer progress) { this.progress = progress; }
+
+    public String getRole() { return role; }
+    public void setRole(String role) { this.role = role; }
 }

@@ -3,6 +3,8 @@ package com.example.wayuunext_app.model;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import jakarta.persistence.*;
 
 @Entity
@@ -17,6 +19,9 @@ public class Pregunta {
     private Test test;
 
     private String texto;
+
+    // se puede enviar al crear un test, pero nunca se devuelve al cliente
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private Integer correcta;
 
     @OneToMany(mappedBy = "pregunta", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
@@ -31,6 +36,8 @@ public class Pregunta {
 
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
+
+    public void setTest(Test test) { this.test = test; }
 
     public String getTexto() { return texto; }
     public void setTexto(String texto) { this.texto = texto; }

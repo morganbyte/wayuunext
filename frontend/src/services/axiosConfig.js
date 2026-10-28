@@ -8,9 +8,9 @@ const axiosInstance = axios.create({
 // interceptor para agregar el token a cada request
 axiosInstance.interceptors.request.use(
     (config) => {
-        const user = JSON.parse(localStorage.getItem("user"));
-        if (user && user.token) {
-            config.headers.Authorization = 'Bearer ${user.token}';
+        const token = localStorage.getItem("authToken");
+        if (token) {
+            config.headers.Authorization = `Bearer ${token}`;
         }
         return config;
     },

@@ -9,6 +9,7 @@ const Header = () => {
 
     const handleLogout = () => {
         localStorage.removeItem('authToken');
+        localStorage.removeItem('userId');
         setIsLoggedIn(false);
         navigate('/login', { replace: true });
         window.location.reload();

@@ -27,6 +27,13 @@ public class ResultadoUsuario {
         this.completado = completado;
     }
 
+    public ResultadoUsuario(Usuario user, Test test, Integer puntuacion, Boolean completado) {
+        this.user = user;
+        this.test = test;
+        this.puntuacion = puntuacion;
+        this.completado = completado;
+    }
+
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
 

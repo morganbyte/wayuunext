@@ -1,0 +1,35 @@
+# Levanta la base de datos y el backend. Necesita un archivo .env (ver .env.example).
+# El frontend se arranca aparte: cd frontend && npm start
+services:
+  db:
+    image: postgres:17
+    environment:
+      POSTGRES_USER: ${DB_USERNAME}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: ${DB_NAME:-wayuu_db}
+    ports:
+      - "5432:5432"
+    volumes:
+      - wayuu-data:/var/lib/postgresql/data
+      # solo se ejecuta la primera vez, con el volumen vacío
+      - ./script.sql:/docker-entrypoint-initdb.d/01-script.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 3s
+      retries: 20
+
+  api:
+    build: .
+    environment:
+      DB_URL: jdbc:postgresql://db:5432/${DB_NAME:-wayuu_db}
+      DB_USERNAME: ${DB_USERNAME}
+      DB_PASSWORD: ${DB_PASSWORD}
+      JWT_SECRET: ${JWT_SECRET}
+    ports:
+      - "8080:8080"
+    depends_on:
+      db:
+        condition: service_healthy
+
+volumes:
+  wayuu-data:

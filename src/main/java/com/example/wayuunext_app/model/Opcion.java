@@ -27,6 +27,8 @@ public class Opcion {
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
 
+    public void setPregunta(Pregunta pregunta) { this.pregunta = pregunta; }
+
     public String getTexto() { return texto; }
     public void setTexto(String texto) { this.texto = texto; }
 

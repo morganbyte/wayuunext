@@ -12,16 +12,6 @@ public class UserController {
     @Autowired
     private UserService userService;
 
-    @PostMapping("/add")
-    public ResponseEntity<?> addUser(@RequestBody Usuario usuario) {
-        if (usuario.getPassword() == null || usuario.getPassword().isEmpty()) {
-            return ResponseEntity.badRequest().body("Password cannot be null or empty");
-        }
-
-        Usuario savedUser = userService.addUser(usuario);
-        return ResponseEntity.ok(savedUser);
-    }
-
     @PostMapping("/register")
     public ResponseEntity<?> registerUser(@RequestBody Usuario usuario) {
         // verifica que la contraseña no sea nula ni vacía

@@ -1,5 +1,6 @@
 package com.example.wayuunext_app.controller;
 
+import java.security.Principal;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -11,6 +12,7 @@ import org.springframework.web.bind.annotation.*;
 
 import com.example.wayuunext_app.model.*;
 import com.example.wayuunext_app.repository.*;
+import com.example.wayuunext_app.service.ProgressService;
 
 @RestController
 @RequestMapping("/api/tests")
@@ -22,7 +24,9 @@ public class TestController {
     @Autowired
     private OpcionRepository opcionRepository;
     @Autowired
-    private ResultadoUsuarioRepository resultadoUsuarioRepository;
+    private UserRepository userRepository;
+    @Autowired
+    private ProgressService progressService;
 
     @GetMapping
     public List<Test> getAllTests() {
@@ -42,29 +46,35 @@ public class TestController {
     @PostMapping("/{testId}/evaluar")
     public ResponseEntity<Map<String, Object>> evaluarTest(
             @PathVariable Long testId,
-            @RequestBody List<RespuestaDTO> respuestasUsuario) {
-  
+            @RequestBody List<RespuestaDTO> respuestasUsuario,
+            Principal principal) {
+
+        Test test = testRepository.findById(testId).orElse(null);
         List<Pregunta> preguntas = preguntaRepository.findByTestId(testId);
+        if (test == null || preguntas.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+
+        Usuario usuario = userRepository.findByUsername(principal.getName())
+                .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
+
         int correctas = 0;
         List<Map<String, Object>> detalle = new ArrayList<>();
 
         for (Pregunta pregunta : preguntas) {
             RespuestaDTO respuesta = respuestasUsuario.stream()
-                .filter(r -> r.getPreguntaId().equals(pregunta.getId()))
+                .filter(r -> pregunta.getId().equals(r.getPreguntaId()))
                 .findFirst()
                 .orElse(null);
 
-            if (respuesta == null) {
+            if (respuesta == null || respuesta.getRespuesta() == null) {
                 return ResponseEntity.badRequest().body(Map.of(
                     "error", "Faltan respuestas para alguna pregunta"
                 ));
             }
 
-            Opcion opcionCorrecta = opcionRepository.findByPreguntaIdAndIndice(pregunta.getId(), respuesta.getRespuesta()).orElse(null);
-            boolean esCorrecta = opcionCorrecta != null && 
-                                 opcionCorrecta.getIndice().equals(respuesta.getRespuesta()) &&
-                                 pregunta.getCorrecta().equals(opcionCorrecta.getIndice());
-
+            // la corrección se hace solo aquí, el cliente nunca recibe la respuesta correcta antes de contestar
+            boolean esCorrecta = respuesta.getRespuesta().equals(pregunta.getCorrecta());
             if (esCorrecta) correctas++;
 
             Map<String, Object> info = new HashMap<>();
@@ -76,28 +86,21 @@ public class TestController {
         }
 
         int puntuacion = (correctas * 100) / preguntas.size();
-        String mensaje = puntuacion >= 70 ? "Test aprobado" : "Test no aprobado";
+        int progreso = progressService.registrarResultado(usuario, test, puntuacion);
+        String mensaje = puntuacion >= ProgressService.PUNTUACION_APROBADO ? "Test aprobado" : "Test no aprobado";
 
         Map<String, Object> resultado = new HashMap<>();
         resultado.put("puntuacion", puntuacion);
         resultado.put("detalle", detalle);
         resultado.put("message", mensaje);
+        resultado.put("progreso", progreso);
 
         return ResponseEntity.ok(resultado);
-    }
-
-    @PostMapping("/{testId}/guardar-resultado")
-    public ResponseEntity<String> guardarResultado(
-        @PathVariable Long testId,
-        @RequestBody ResultadoUsuario resultado) {
-
-    resultadoUsuarioRepository.save(resultado);
-    return ResponseEntity.ok("Resultado guardado exitosamente.");
     }
 
     @PostMapping("/create")
     public ResponseEntity<Test> createTest(@RequestBody Test test) {
         Test savedTest = testRepository.save(test);
         return ResponseEntity.ok(savedTest);
-}
+    }
 }

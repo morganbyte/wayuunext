@@ -18,6 +18,7 @@ export const login = (username, password) => {
 };
 
 export const logout = () => {
-    localStorage.removeItem("authtoken");
+    localStorage.removeItem("authToken");
+    localStorage.removeItem("userId");
     window.location.href = "/login";
 }

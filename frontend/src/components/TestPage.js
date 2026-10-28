@@ -24,7 +24,7 @@ const TestPage = () => {
                 })
                 .catch((error) => console.error("Error al cargar preguntas:", error));
         }
-    }, [testId], userId);
+    }, [testId, userId]);
 
     // manejar respuesta seleccionada
     const handleAnswer = (selectedIndex) => {
@@ -53,9 +53,10 @@ const TestPage = () => {
             setCurrentIndex(currentIndex + 1);
         } else {
             console.log("Última pregunta respondida, enviando resultados.");
+            // el backend corrige el test y actualiza el progreso del usuario autenticado
             fetch(`http://localhost:8080/api/tests/${testId}/evaluar`, {
                 method: "POST",
-                headers: { "Content-Type": "application/json" },
+                headers: { "Content-Type": "application/json", "Authorization": `Bearer ${localStorage.getItem('authToken')}` },
                 body: JSON.stringify([...respuestas, nuevaRespuesta]),
             })
                 .then((res) => res.json())
@@ -69,50 +70,14 @@ const TestPage = () => {
         }
     };
 
-    console.log("Respuestas enviadas al backend:", respuestas);
-
-    // enviar respuestas al backend
-    const enviarRespuestas = () => {
-        fetch(`http://localhost:8080/api/tests/${testId}/evaluar`, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(respuestas),
-        })
-            .then((res) => res.json())
-            .then((resultado) => {
-                console.log("Resultado del test:", resultado);
-                if (resultado.puntuacion >= 70) {
-                    alert(`¡Test aprobado! Puntuación: ${resultado.puntuacion}%`);
-                } else {
-                    alert(`Test no aprobado. Puntuación: ${resultado.puntuacion}%`);
-                }
-                fetch(`http://localhost:8080/api/progress/update?userId=${userId}`, {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json", "Authorization": `Bearer ${localStorage.getItem('authToken')}` },
-                    body: JSON.stringify({ testId, puntuacion: resultado.puntuacion }),
-                })
-                    .then((res) => res.json())
-                    .then((data) => {
-                        console.log("Progreso actualizado: ", data);
-                    })
-                    .catch((error) => console.error("Error al actualizar progreso:", error));
-            })
-            .catch((error) => console.error("Error al evaluar test", error));
-    };
-
-    useEffect(() => {
-        if (showResult && !resultado) {
-            enviarRespuestas();
-        }
-    }, [showResult, resultado, enviarRespuestas]);
-
     return (
         <div>
             {showResult ? (
                 resultado ? (
                     <div className="container mt-5">
                         <h1 className="text-primary mb-4">Resultados</h1>
-                        <h4 className="mb-4">Puntuación: <span className="text-success">{resultado.puntuacion}%</span></h4>
+                        <h4 className="mb-2">Puntuación: <span className="text-success">{resultado.puntuacion}%</span></h4>
+                        <p className="mb-4">{resultado.message} · Progreso total: {resultado.progreso}%</p>
                         <ul className="list-group">
                             {resultado.detalle.map((detalle, index) => (
                                 <li key={index} className={`list-group-item ${detalle.esCorrecta ? 'list-group-item-success' : 'list-group-item-danger'}`}>

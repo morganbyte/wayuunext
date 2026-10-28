@@ -15,6 +15,10 @@ public class UserService {
     private PasswordEncoder passwordEncoder;
 
     public Usuario addUser(Usuario usuario) {
+        // un registro nunca puede sobrescribir otro usuario ni darse progreso o permisos
+        usuario.setId(null);
+        usuario.setProgress(0);
+        usuario.setRole("USER");
         usuario.setPassword(passwordEncoder.encode(usuario.getPassword()));
         return userRepository.save(usuario);
     }

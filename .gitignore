@@ -31,3 +31,7 @@ build/
 
 ### VS Code ###
 .vscode/
+
+### Secretos y dependencias ###
+.env
+node_modules/
